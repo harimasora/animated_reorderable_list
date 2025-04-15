@@ -239,7 +239,22 @@ abstract class ReorderableAnimatedListBaseState<
     enteries.add(entry);
   }
 
+  bool areSameItems(List oldList, List newList) => setEquals(Set.from(oldList), Set.from(newList));
+
+  void reorderItems(List oldList, List newList) {
+    for (int i = 0; i < newList.length; i++) {
+      final item = newList[i];
+      final oldIndex = oldList.indexWhere((oldItem) => isSameItem(oldItem, item));
+      listKey.currentState!.replace(oldIndex, i);
+    }
+  }
+
   void calculateDiff(List oldList, List newList) {
+    if (areSameItems(oldList, newList)) {
+      reorderItems(oldList, newList);
+      return;
+    }
+    
     final swappedPairs = [];
 
     if (oldList.length == newList.length && widget.enableSwap) {

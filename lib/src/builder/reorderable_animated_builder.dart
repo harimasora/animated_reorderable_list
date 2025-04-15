@@ -658,6 +658,19 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
         startOffset: toOffset, endOffset: fromOffset, animate: !_isDragging);
   }
 
+  void replace(int fromIndex, int toIndex) {
+    if (fromIndex == toIndex) return;
+    if (!childrenMap.containsKey(fromIndex) || !childrenMap.containsKey(toIndex)) {
+      return;
+    }
+    if (_dragInfo != null || _isDragging) return;
+
+    final fromOffset = _itemOffsetAt(fromIndex);
+    final toOffset = _itemOffsetAt(toIndex);
+    childrenMap[toIndex] =
+        childrenMap[fromIndex]!.copyWith(startOffset: fromOffset, endOffset: toOffset, animate: !_isDragging);
+  }
+
   void _onItemRemoved(int itemIndex, Duration removeDuration) {
     final updatedChildrenMap = <int, ItemTransitionData>{};
     if (childrenMap.containsKey(itemIndex)) {
@@ -684,6 +697,7 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     final itemRenderBox =
         _items[index]?.context.findRenderObject() as RenderBox?;
     if (itemRenderBox == null) return Offset.zero;
+    if (!itemRenderBox.attached) return Offset.zero;
     return itemRenderBox.localToGlobal(Offset.zero);
   }
 
