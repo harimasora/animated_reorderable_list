@@ -239,7 +239,10 @@ abstract class ReorderableAnimatedListBaseState<
     enteries.add(entry);
   }
 
-  bool areSameItems(List oldList, List newList) => setEquals(Set.from(oldList), Set.from(newList));
+  bool areSameItems(List oldList, List newList) {
+    if (oldList.length != newList.length) return false;
+    return oldList.every((oldItem) => newList.any((newItem) => isSameItem(oldItem, newItem)));
+  }
 
   void reorderItems(List oldList, List newList) {
     for (int i = 0; i < newList.length; i++) {
